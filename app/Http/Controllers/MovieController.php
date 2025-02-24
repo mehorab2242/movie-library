@@ -23,16 +23,6 @@ class MovieController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create() : View
-    {
-        //
-        return view('movies.create');
-
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request): JsonResponse
@@ -40,19 +30,19 @@ class MovieController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
             'description' => 'nullable',
-            'release_year' => 'required|integer',
+            'release_year' => 'required|integer|between:1900,' .date('Y'),
             'director' => 'required|string|max:255',
             'genre' => 'nullable|string',
             'rating' => 'required|numeric|between:0,10',
         ]);
 
         if ($validator->fails()) {
-            return $validator->errors();
+            return response()->json($validator->errors(), 400);
         }
         $movieData = [
             'title' => $request->get('title'),
             'description' => $request->get('description'),
-            'release_year' => 'required|integer|between:1900,' .date('Y'),
+            'release_year' => $request->get('release_year'),
             'director' => $request->get('director'),
             'genre' => $request->get('genre'),
             'rating' => $request->get('rating'),
@@ -61,10 +51,10 @@ class MovieController extends Controller
             Movie::create($movieData);
 
         }catch (\Exception $exception){
-            return $exception;
+            return response()->json([$exception->getMessage()]);
         }
 
-        return $movieData;
+        return response()->json([$movieData]);
     }
 
     /**
@@ -81,34 +71,33 @@ class MovieController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
-        //
+
         $movie = Movie::find($id);
+
         if (!$movie) {
             return response()->json(['message' => 'Movie not found'], 404);
         }
+
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'release_year' => 'required|integer|between:1900,' .date('Y'),
-            'director' => 'required|max:255',
+            'release_year' => 'sometimes|required|integer|between:1900,' . date('Y'),
+            'director' => 'sometimes|required|string|max:255',
             'genre' => 'nullable|string|max:100',
             'rating' => 'nullable|numeric|between:0,10',
-
         ]);
-        $movie->update($request->all());
-        return response()->json($movie, 200);
+
+        try {
+            $movie->update($request->only(['title', 'description', 'release_year', 'director', 'genre', 'rating']));
+            return response()->json($movie, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update movie', 'message' => $e->getMessage()], 500);
+        }
+
     }
 
     /**
@@ -121,7 +110,12 @@ class MovieController extends Controller
         if (!$movie) {
             return response()->json(['message' => 'Movie not found'], 404);
         }
-        $movie->delete();
-        return response()->json(['message' => 'Movie deleted'], 200);
+        try {
+            $movie->delete();
+            return response()->json(['message' => 'Movie deleted'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete movie', 'message' => $e->getMessage()], 500);
+        }
+
     }
 }
