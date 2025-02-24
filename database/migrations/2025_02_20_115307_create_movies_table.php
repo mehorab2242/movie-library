@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('director');
             $table->string('genre')->nullable();
             $table->decimal('rating', 3, 1)->nullable();
-            $table->timestamps();
+            $table->dateTime('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
         });
     }
 

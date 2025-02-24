@@ -12,7 +12,8 @@ use Illuminate\View\View;
 class MovieController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the Created Movie.
+     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
@@ -23,7 +24,9 @@ class MovieController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created movie in storage.
+     * @param Request $request
+     * @return JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
@@ -39,31 +42,33 @@ class MovieController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
-        $movieData = [
-            'title' => $request->get('title'),
-            'description' => $request->get('description'),
-            'release_year' => $request->get('release_year'),
-            'director' => $request->get('director'),
-            'genre' => $request->get('genre'),
-            'rating' => $request->get('rating'),
-        ];
-        try {
-            Movie::create($movieData);
 
-        }catch (\Exception $exception){
-            return response()->json([$exception->getMessage()]);
+        try {
+            $movieData = [
+                'title' => $request->get('title'),
+                'description' => $request->get('description'),
+                'release_year' => $request->get('release_year'),
+                'director' => $request->get('director'),
+                'genre' => $request->get('genre'),
+                'rating' => $request->get('rating'),
+            ];
+            Movie::create($movieData);
+            return response()->json(['message' => 'Movie added successfully'], 200);
+        } catch (\Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], 500);
         }
 
-        return response()->json([$movieData]);
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified single movie.
+     * @param int $id
+     * @return JsonResponse
      */
-    public function show(string $id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         //
-        $movie = Movie::find($id);
+        $movie = Movie::findOrFail($id);
         if (!$movie) {
             return response()->json(['message' => 'Movie not found'], 404);
         }
@@ -71,16 +76,15 @@ class MovieController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified movie in storage.
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
 
-        $movie = Movie::find($id);
 
-        if (!$movie) {
-            return response()->json(['message' => 'Movie not found'], 404);
-        }
 
         $request->validate([
             'title' => 'sometimes|required|string|max:255',
@@ -90,10 +94,17 @@ class MovieController extends Controller
             'genre' => 'nullable|string|max:100',
             'rating' => 'nullable|numeric|between:0,10',
         ]);
+        $movie = Movie::findOrFail($id);
+
+        if (!$movie) {
+            return response()->json(['message' => 'Movie not found'], 404);
+        }
 
         try {
             $movie->update($request->only(['title', 'description', 'release_year', 'director', 'genre', 'rating']));
-            return response()->json($movie, 200);
+            return response()->json([
+                'message' => 'Movie updated successfully',
+                'movie' => $movie], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update movie', 'message' => $e->getMessage()], 500);
         }
@@ -101,12 +112,14 @@ class MovieController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified movie from storage.
+     * @param int $id
+     * @return JsonResponse
      */
-    public function destroy(string $id):JsonResponse
+    public function destroy(int $id):JsonResponse
     {
         //
-        $movie = Movie::find($id);
+        $movie = Movie::findOrFail($id);
         if (!$movie) {
             return response()->json(['message' => 'Movie not found'], 404);
         }
