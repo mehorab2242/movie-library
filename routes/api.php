@@ -19,4 +19,4 @@ Route::get('movies', [MovieController::class, 'index']);
 Route::get('movies/{id}', [MovieController::class, 'show']);
 Route::delete('movies/{id}', [MovieController::class, 'destroy']);
 Route::post('movies', [MovieController::class, 'store']);
-Route::put('movies/{id}', [MovieController::class, 'update']);
+Route::put('movies/{id}', [MovieController::class, 'update']); // remove update from movies/update/{id}

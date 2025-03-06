@@ -1,11 +1,13 @@
 <template>
 
+    <!-- movie content -->
     <div class="w-full h-screen bg-blue-950 p-3 sm:p-10">
         <div class="w-full h-full bg-white p-5 sm:p-10 rounded-2xl drop-shadow-xl">
 
+            <!-- movie content header part -->
             <div class="block sm:flex justify-between items-center mb-5">
 
-                <!-- search -->
+                <!-- search part -->
                 <div class="w-full sm:max-w-[450px] mb-3 sm:mb-0">
                     <div class="relative">
                         <input type="text" name="keyword" class="w-full py-3 ps-12 pe-5 rounded-xl outline-0 border border-gray-400" placeholder="Search here" v-model="keyword" required autocomplete="off" @input="searchData()" />
@@ -21,7 +23,7 @@
                     </div>
                 </div>
 
-                <!-- open modal button -->
+                <!-- open modal button part -->
                 <div class="flex justify-end items-center ms-3">
                     <button type="button" class="bg-blue-700 duration-500 hover:bg-blue-950 py-3 px-5 min-w-[110px] inline-flex justify-center items-center outline-0 border-0 text-white rounded-xl" @click="openManageModal(null)">
                         <span class="me-1"> New </span>
@@ -37,6 +39,7 @@
 
             </div>
 
+            <!-- movie content body part -->
             <div class="w-full bg-gray-200 overflow-y-auto rounded-xl" :class="{ 'h-[calc(100vh-280px)] p-5' : paginatedMovies.length > 0 && !loading, 'h-[calc(100vh-230px)]' : paginatedMovies.length === 0 && !loading, 'h-[calc(100vh-225px)]' : loading }">
 
                 <!-- loading part -->
@@ -94,6 +97,7 @@
 
             </div>
 
+            <!-- movie content footer part -->
             <!-- pagination part -->
             <div class="mt-7 flex justify-center items-center rounded-md gap-x-2" v-if="paginatedMovies.length > 0 && !loading">
                 <!-- Previous Button -->
@@ -120,6 +124,8 @@
     <!-- manage modal -->
     <div class="fixed inset-0 size-full grid sm:justify-center items-center duration-500 z-50 overflow-y-auto scrollbar p-5 md:p-16" :class="{ 'invisible bg-black/35' : !manageModal, 'visible bg-black/65' : manageModal }" @click="manageModal = false">
         <form @submit.prevent="manageApi" class="bg-white rounded-2xl min-w-full sm:min-w-[550px] p-5 sm:p-10 duration-500 origin-top" :class="{ '-translate-y-1/2 opacity-0' : !manageModal, 'translate-y-0 opacity-100' : manageModal }" @click.stop>
+
+            <!-- manage modal header part -->
             <div class="flex justify-between items-center mb-4">
                 <div class="text-[18px] md:text-[25px] font-medium">
                     <span v-if="this.formData.id === undefined"> Create </span>
@@ -136,6 +142,8 @@
                     </svg>
                 </button>
             </div>
+
+            <!-- manage modal body -->
             <div class="w-full mb-4">
                 <div class="mb-3 w-full">
                     <label for="title" class="block mb-1 text-[14px] sm:text-[18px] font-medium"> Title </label>
@@ -183,6 +191,8 @@
                     <div class="text-rose-500 text-[14px]" v-if="error.rating"> {{error.rating[0]}} </div>
                 </div>
             </div>
+
+            <!-- manage modal footer part -->
             <div class="flex justify-end items-center gap-2">
                 <button type="button" class="min-w-[100px] sm:min-w-[120px] min-h-[45px] sm:min-h-[50px] text-[14px] font-medium sm:text-[16px] inline-flex justify-center items-center bg-gray-200 text-gray-950 duration-500 hover:bg-gray-600 hover:text-white rounded-xl" @click="closeManageModal()">
                     Cancel
@@ -201,13 +211,18 @@
                     </svg>
                 </button>
             </div>
+
         </form>
     </div>
 
     <!-- delete modal -->
     <div class="fixed inset-0 size-full grid sm:justify-center items-center duration-500 z-50 overflow-y-auto scrollbar p-5 md:p-16" :class="{ 'invisible bg-black/35' : !deleteModal, 'visible bg-black/65' : deleteModal }" @click="deleteModal = false">
         <form @submit.prevent="deleteApi()" class="bg-white rounded-2xl min-w-full sm:min-w-[450px] p-5 sm:p-10 duration-500 origin-top" :class="{ '-translate-y-1/2 opacity-0' : !deleteModal, 'translate-y-0 opacity-100' : deleteModal }" @click.stop>
+
+            <!-- manage modal body part -->
             <div class="mb-5 flex justify-center items-center flex-col">
+
+                <!-- manage modal icon part -->
                 <svg viewBox="0 0 24 24" class="size-[75px]" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -215,8 +230,13 @@
                         <path d="M4 7H20" class="stroke-rose-600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                         <path class="stroke-rose-600" d="M6 10L7.70141 19.3578C7.87432 20.3088 8.70258 21 9.66915 21H14.3308C15.2974 21 16.1257 20.3087 16.2986 19.3578L18 10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                         <path class="stroke-rose-600" d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+
+                <!-- manage modal body title part -->
                 <div class="mt-3 text-[18px] sm:text-[21px] text-center text-rose-600"> Are you sure? </div>
+
             </div>
+
+            <!-- manage modal footer part -->
             <div class="flex justify-center items-center gap-2">
                 <button type="button" class="min-w-[120px] min-h-[50px] text-[14px] sm:text-[16px] inline-flex justify-center items-center bg-gray-200 text-gray-950 duration-500 hover:bg-gray-600 hover:text-white rounded-xl" @click="closeDeleteModal()">
                     Cancel
@@ -283,9 +303,8 @@ export default {
     },
 
     data() {
-
         return {
-
+            // Data Properties
             formData: {
                 title: '',
                 description: '',
@@ -326,20 +345,17 @@ export default {
             searchTimeout: null,
             deleteId: null,
             deleteLoading: false,
-
         }
-
     },
 
     mounted() {
-
+        // Mounted Properties
         this.listApi();
-
     },
 
     methods: {
 
-        // set rating
+        // set rating of manage modal part
         setRating(star) {
             this.rating = star;
             this.formData.rating = star;
@@ -380,9 +396,9 @@ export default {
         },
 
         // List api
-        listApi() {
+        async listApi() {
             this.loading = true;
-            axios.get('/api/movies',{ headers: { 'Content-Type': 'application/json; charset=utf-8' }}).then( (response) => {
+            axios.get('/api/movies',{ headers: { 'Content-Type': 'application/json; charset=utf-8' }}).then( async (response) => {
                 this.tableData = response.data;
             }).catch(error => {
                 this.error = error.response.data;
